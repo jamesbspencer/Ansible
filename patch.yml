@@ -1,6 +1,6 @@
-- name: patch CentOS systems
-  hosts: all
-  tasks:
-    yum:
-      name: "*"
-      state: latest
+  - name: patch CentOS systems
+    hosts: all
+    tasks:
+      yum:
+        name: "*"
+        state: latest
