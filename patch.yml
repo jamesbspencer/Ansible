@@ -1,5 +1,7 @@
-tasks:
-  - name: Patch CentOS
-    yum:
-      name: "*"
-      state: latest
+- name: Patching
+  hosts: all
+  tasks:
+    - name: Patch CentOS
+      yum:
+        name: "*"
+        state: latest
