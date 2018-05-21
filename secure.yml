@@ -3,7 +3,7 @@
   tasks:
     - name: Disable root ssh
       lineinfile: dest=/etc/ssh/sshd_config
-        regexp="^.PermitRootLogin"
+        regexp="^[#P]*ermitRootLogin"
         line="PermitRootLogin no"
         state=present
       notify: Restart ssh
