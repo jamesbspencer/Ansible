@@ -7,3 +7,5 @@
         state: latest
         skip_broken: yes
         update_cache: yes
+        disable_plugin: rhnplugin
+        disable_gpg_check: yes
