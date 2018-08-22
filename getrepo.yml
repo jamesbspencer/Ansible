@@ -1,0 +1,10 @@
+----
+- name: Get Repo
+  hosts: centos
+  become: yes
+  tasks:
+    - name: My Repo
+      get_url:
+        url: http://repo.spencer.loc/repos/interna-repo.repo
+        dest: /etc/yum.repos.d/internal-repo.repo
+    
