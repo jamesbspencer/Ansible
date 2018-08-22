@@ -1,5 +1,6 @@
 - name: Patching
-  hosts: all
+  hosts: centos
+  become: yes
   tasks:
     - name: Patch CentOS
       yum:
