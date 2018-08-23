@@ -1,0 +1,8 @@
+---
+- hosts: centos
+  become: yes
+  tasks:
+  - file:
+    path: /etc/yum.repos.d/spacewalk-client.repo
+    state: absent
+    
