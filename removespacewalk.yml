@@ -8,7 +8,7 @@
   - file:
     path: /etc/yum.repos.d/group_spacewalkproject-spacewalk-2.8-client-epel-7.repo
     state: absent
-  - files:
+  - file:
     path: /etc/yum.repos.d/spacewalk-client-repo-2.8-11.el7.centos.noarch.rpm
     state: absent
   - yum:
