@@ -1,0 +1,11 @@
+----
+- name: SCAP
+  hosts: centos
+  become: yes
+  tasks:
+  - block:
+    - name: Run SCAP scan
+      command: oscap xccdf \
+        --profile standard \
+        --report report.html \
+        /usr/share/xml/scap/ssg/content/ssg-centos7-xccdf.xml
