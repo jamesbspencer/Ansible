@@ -1,5 +1,6 @@
 - name: Secure system
   hosts: all
+  become: yes
   tasks:
     - name: Disable root ssh
       lineinfile: dest=/etc/ssh/sshd_config
