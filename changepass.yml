@@ -1,0 +1,22 @@
+##Ansible playbook to change passwords##
+##Created by: James Spencer##
+##to run: ansible-playbook -v /path/password.yml --extra-vars "user=username pass=password"##
+
+- name: "Change Password"
+  hosts: localhost,aesip*,gcss*
+  become: yes
+
+
+  tasks:
+    - name: "Change the user's password"
+      user:
+        name: "{{ user }}"
+        password: "{{ pass | password_hash('sha512') }}"
+    - name: "Unlock  Account"
+      command: /usr/bin/passwd -u "{{ user }}"
+    - name: "Linux: Reset Pam Tally"
+      command: /usr/sbin/pam_tally2 -r -u "{{ user }}"
+      when: ansible_facts['ansible_system'] == "Linux"
+    - name: "Linux 5: Reset faillog"
+      command: /usr/bin/faillog -r -u "{{ user }}"
+      when: (ansible_facts['ansible_system'] == "Linux" and ansible_facts['distribution_major_version'] == "5")
