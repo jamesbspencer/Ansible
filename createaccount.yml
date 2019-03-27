@@ -1,0 +1,21 @@
+##Ansible playbook to create an account##
+##Created by: James Spencer##
+##to run: ansible-playbook -v /path/create_acct.yml --extra-vars "user=username id=uid grp=gid cmt='comment' pass=password"
+
+- name: "Create Account"
+  hosts: localhost
+  become: yes
+
+
+  tasks:
+    - name: "Print Variables"
+      debug:
+        msg: "User {{ user }} with password {{ pass }}"
+
+    - name: "Create the account"
+      user:
+        name: "{{ user }}"
+        uid: "{{ id }}"
+        group: "{{ grp }}"
+        comment: "{{ cmt }}"
+        password: "{{ pass | password_hash('sha512', 'HashedAndSalted') }}"
