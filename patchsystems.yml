@@ -17,7 +17,7 @@
       poll: 0
       register: yum_sleeper
       
-    - name: Check on yum_sleeper every 60 seconds
+    - name: Check on the YUM task every 60 seconds
       async_status:
         jid: "{{ yum_sleeper.ansible_job_id }}"
       register: job_result
