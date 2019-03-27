@@ -1,0 +1,19 @@
+##Ansible playbook to create an account##
+##Created by: James Spencer##
+##to run: ansible-playbook -v /path/create_acct.yml --extra-vars "user=username"
+
+- name: "Delete Account"
+  hosts: localhost
+  become: yes
+
+
+  tasks:
+    - name: "Print Variables"
+      debug:
+        msg: "User {{ user }}"
+
+    - name: "Delete the account"
+      user:
+        name: "{{ user }}"
+        state: absent
+        remove: yes
