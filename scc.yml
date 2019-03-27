@@ -1,0 +1,94 @@
+##Update SCAP and run scans##
+##Create by James Spencer##
+
+- name: Run SCAP
+  hosts: localhost
+  become: true
+  vars:
+    rh6bench: U_RedHat_6_V1R22_STIG_SCAP_1-2_Benchmark.zip
+
+  tasks:
+  - name: "Get Linux afacts"
+    package_facts:
+      manager: "rpm"
+    when: ansible_distribution == "RedHat"
+
+  - name: "RHEL6: Copy new SCC file"
+    copy:
+      src: /home/jspencer/SCC/scc-5.1.rhel6.x86_64.rpm
+      dest: /var/tmp/scc-5.1.rhel6.x86_64.rpm
+    when:
+      - ansible_distribution == "RedHat"
+      - ansible_facts['distribution_major_version'] == "6"
+      - ansible_facts.packages.spawarscc[0].version < 5.1
+
+  - name: "RHEL6: Update SCC"
+    yum:
+      name: /var/tmp/scc-5.1.rhel6.x86_64.rpm
+      state: present
+    when:
+      - ansible_distribution == "RedHat"
+      - ansible_facts['distribution_major_version'] == "6"
+      - ansible_facts.packages.spawarscc[0].version < 5.1
+
+  - name: "RHEL6: Copy new Benchmark"
+    copy:
+      src: /home/jspencer/SCC/{{ rh6bench }}
+      dest: /var/tmp/{{ rh6bench }}
+    when:
+      - ansible_distribution == "RedHat"
+      - ansible_facts['distribution_major_version'] == "6"
+
+  - name: "RHEL6: Import Benchmark"
+    command: /opt/scc/cscc --is /var/tmp/{{ rh6bench }}
+    when:
+      - ansible_distribution == "RedHat"
+      - ansible_facts['distribution_major_version'] == "6"
+
+
+##Configure SCAP
+  - command: /opt/scc/cscc --setProfile MAC-2_Sensitive RHEL_6_STIG
+    when:
+      - ansible_distribution == "RedHat"
+      - ansible_facts['distribution_major_version'] == "6"
+  - command: /opt/scc/cscc --setOpt allSettingsHTMLReport 0
+  - command: /opt/scc/cscc --setOpt allSettingsTextReport 0
+  - command: /opt/scc/cscc --setOpt nonComplianceHTMLReport 0
+  - command: /opt/scc/cscc --setOpt nonComplianceTextReport 0
+  - command: /opt/scc/cscc --setOpt allSettingsSummaryHTMLReport 0
+  - command: /opt/scc/cscc --setOpt allSettingsSummaryTextReport 0
+  - command: /opt/scc/cscc --setOpt nonComplianceSummaryHTMLReport 0
+  - command: /opt/scc/cscc --setOpt nonComplianceSummaryTextReport 0
+  - command: /opt/scc/cscc --setOpt keepXCCDFXML 1
+  - command: /opt/scc/cscc --setOpt keepOVALXML 0
+  - command: /opt/scc/cscc --setOpt keepOCILXML 0
+  - command: /opt/scc/cscc --setOpt keepARFXML 0
+  - command: /opt/scc/cscc --setOpt keepCPEXML 0
+  - command: /opt/scc/cscc --setOpt enableSummaryViewer 0
+  - command: /opt/scc/cscc --setOpt userDataDirectory /var/tmp
+  - command: /opt/scc/cscc --setOpt userDataDirectoryValue 3
+  - command: /opt/scc/cscc --setOpt dirResultsLogsEnabled 0
+  - command: /opt/scc/cscc --setOpt dirTargetNameEnabled 0
+  - command: /opt/scc/cscc --setOpt dirXMLEnabled 0
+  - command: /opt/scc/cscc --setOpt dirStreamNameEnabled 0
+  - command: /opt/scc/cscc --setOpt dirContentTypeEnabled 0
+  - command: /opt/scc/cscc --setOpt dirTimestampEnabled 0
+  - command: /opt/scc/cscc --setOpt fileTargetNameEnabled 1
+  - command: /opt/scc/cscc --setOpt fileSCCVersionEnabled 1
+  - command: /opt/scc/cscc --setOpt fileTimestampEnabled 1
+
+  - name: "Run the SCAP scan"
+    command: /opt/scc/cscc
+
+  - name: "Find the XCCDF file"
+    find:
+      paths: /var/tmp
+      patterns: '*XCCDF*.xml'
+      age: -1h
+    register: xccdf_file
+
+  - name: "Fetch the results"
+    fetch:
+      src: "{{ xccdf_file.files[0].path }}"
+      dest: /home/jspencer/xccdf/
+      flat: yes
