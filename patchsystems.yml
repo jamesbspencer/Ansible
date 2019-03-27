@@ -1,5 +1,7 @@
 ##Patching systems##
 ##Created by James Spencer##
+##To run: ansible-playbook -v patchsystems.yml ##
+
 - name: Patching
   hosts: redhat-group
   become: yes
